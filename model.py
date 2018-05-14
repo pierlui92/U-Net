@@ -186,6 +186,8 @@ class U_Net(object):
             print(" [!] Load failed...")
         
         total_time= 0
+        start_iter = self.counter
+
         while self.counter <= self.num_epochs*self.num_sample:
             # Update network
             start_time = time.time()
@@ -219,7 +221,8 @@ class U_Net(object):
             self.counter += self.batch_size
             
             total_time += time.time() - start_time
-            time_left=(self.num_epochs*self.num_sample - self.counter)*total_time/self.counter
+            total_step = self.counter - start_iter
+            time_left=(self.num_epochs*self.num_sample - total_step)*total_time/self.counter
             print(("Epoch: [%2d/%2d] [%4d/%4d] Loss: [%.4f] Time left: %s" \
                         % (self.counter//self.num_sample, self.num_epochs, self.counter%self.num_sample, self.num_sample, loss , datetime.timedelta(seconds=time_left)))) 
 
