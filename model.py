@@ -60,7 +60,7 @@ class U_Net(object):
         ignore_label = 255
         weightsValue = tf.to_float(tf.not_equal(self.val_sem_gt,ignore_label))
 
-        self.total = tf.reduce_sum(tf.multiply(tf.to_float(tf.equal(tf.cast(self.val_sem_gt,tf.float32),tf.cast(tf.argmax(self.val_sem_pred,axis=-1),tf.float32))),weightsValue))
+        self.total = tf.reduce_sum(tf.multiply(tf.to_float(tf.equal(tf.cast(self.val_sem_gt,tf.float32),tf.cast(tf.expand_dims(tf.argmax(self.val_sem_pred,axis=-1),axis=-1),tf.float32))),weightsValue))
         self.count = tf.reduce_sum(weightsValue)
         
         self.accuracy_placeholder = tf.placeholder(tf.float32)
