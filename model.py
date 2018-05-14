@@ -134,7 +134,7 @@ class U_Net(object):
         count_loc = 0
         for idx in range(self.num_sample_test):
             print("Evaluating accuracy on validation set", idx + 1 ,"/", self.num_sample_test, end= '\r' if idx != self.num_sample_test - 1 else '\n')
-            total_value, count_value = self.sess.run(self.total,self.count)
+            total_value, count_value = self.sess.run([self.total,self.count])
             total_loc += total_value
             count_loc += count_value
         mean_acc = total_loc / count_loc
