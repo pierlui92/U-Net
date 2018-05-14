@@ -59,8 +59,8 @@ class U_Net(object):
         
         ignore_label = 255
         weightsValue = tf.to_float(tf.not_equal(self.val_sem_gt,ignore_label))
-
-        self.total = tf.reduce_sum(tf.multiply(tf.to_float(tf.equal(tf.cast(self.val_sem_gt,tf.float32),tf.cast(tf.expand_dims(tf.argmax(self.val_sem_pred,axis=-1),axis=-1),tf.float32))),weightsValue))
+        self.val_sem_pred = tf.expand_dims(tf.argmax(self.val_sem_pred,axis=-1),axis=-1)
+        self.total = tf.reduce_sum(tf.multiply(tf.to_float(tf.equal(tf.cast(self.val_sem_gt,tf.float32),tf.cast(self.val_sem_pred,tf.float32))),weightsValue))
         self.count = tf.reduce_sum(weightsValue)
         
         self.accuracy_placeholder = tf.placeholder(tf.float32)
@@ -223,8 +223,8 @@ class U_Net(object):
             self.counter += self.batch_size
             
             total_time += time.time() - start_time
-            total_step = self.counter - start_iter
-            time_left=(self.num_epochs*self.num_sample - total_step)*total_time/self.counter
+            time_left = (self.num_epochs*self.num_sample - self.counter)*total_time/(self.counter -start_iter)
+            
             print(("Epoch: [%2d/%2d] [%4d/%4d] Loss: [%.4f] Time left: %s" \
                         % (self.counter//self.num_sample, self.num_epochs, self.counter%self.num_sample, self.num_sample, loss , datetime.timedelta(seconds=time_left)))) 
 
