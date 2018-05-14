@@ -59,6 +59,7 @@ class U_Net(object):
         
         ignore_label = 255
         weightsValue = tf.to_float(tf.not_equal(self.val_sem_gt,ignore_label))
+        
         self.val_sem_pred = tf.expand_dims(tf.argmax(self.val_sem_pred,axis=-1),axis=-1)
         self.total = tf.reduce_sum(tf.multiply(tf.to_float(tf.equal(tf.cast(self.val_sem_gt,tf.float32),tf.cast(self.val_sem_pred,tf.float32))),weightsValue))
         self.count = tf.reduce_sum(weightsValue)
@@ -149,7 +150,7 @@ class U_Net(object):
         
         #summaries for training
         in_pred = tf.expand_dims(tf.argmax(self.input_sem_pred , axis=-1), axis =-1)
-        val_pred = tf.expand_dims(tf.argmax(self.val_sem_pred , axis=-1), axis =-1)
+        val_pred = self.val_sem_pred
         
         tf.summary.image('train',self.input_images,max_outputs=1,collections=["TRAINING_IMAGES"])
         tf.summary.image('train sem gt',color(self.input_sem_gt),max_outputs=1,collections=["TRAINING_IMAGES"])
