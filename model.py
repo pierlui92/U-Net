@@ -56,11 +56,14 @@ class U_Net(object):
 
         self.val_images,self.val_path, self.val_sem_gt = [tf.expand_dims(immy_val,axis=0),tf.expand_dims(path_val,axis=0),tf.expand_dims(immy_val_sem,axis=0)]
         self.val_sem_pred = u_net_model(self.val_images,self.options, True, name = 'u_net',is_test=True)
-        self.val_accuracy = accuracy_op(self.val_sem_pred, self.val_sem_gt)
-
+        
+        ignore_label = 255
+        weightsValue = tf.to_float(tf.not_equal(self.val_sem_gt,ignore_label))
+        self.total = tf.reduce_sum(tf.multiply(tf.to_float(tf.equal(self.val_sem_gt,self.val_sem_pred)),weightsValue))
+        self.count = tf.reduce_sum(weightsValue)
+        
         self.accuracy_placeholder = tf.placeholder(tf.float32)
-        self.val_sem_accuracy_sum = tf.summary.scalar("accuracy",self.accuracy_placeholder, collections=["VALIDATION_SCALAR"])
-            
+        self.val_sem_accuracy_sum = tf.summary.scalar("accuracy",self.accuracy_placeholder, collections=["VALIDATION_SCALAR"])            
 
     def build_input_image_op(self,input_list_txt,is_test=False,is_val=False, num_epochs=None):
         def _parse_function(image_tensor):
@@ -127,12 +130,14 @@ class U_Net(object):
         return image,image_path,im_shape, image_sem
     
     def accuracy_validation(self,args):
-        mean_acc = 0
+        total_loc = 0
+        count_loc = 0
         for idx in range(self.num_sample_test):
             print("Evaluating accuracy on validation set", idx + 1 ,"/", self.num_sample_test, end= '\r' if idx != self.num_sample_test - 1 else '\n')
-            acc = self.sess.run(self.val_accuracy)
-            mean_acc += acc
-        mean_acc = mean_acc / self.num_sample_test
+            total_value, count_value = self.sess.run(self.total,self.count)
+            total_loc += self.total
+            count_loc += self.count
+        mean_acc = total_loc / count_loc
         return mean_acc
 
     def train(self, args):
