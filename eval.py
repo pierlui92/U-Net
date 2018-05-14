@@ -174,7 +174,7 @@ with tf.Session() as sess:
             sem = cv2.imread(predictions[basename],cv2.IMREAD_GRAYSCALE)
             acc_value, _, miou_value, _ =sess.run([acc, update_op_acc, miou, update_op],feed_dict={sem_seg_placeholder : np.expand_dims(sem,axis=-1) , sem_gt_placeholder : semgt})
             #, im_shape_w: semgt.shape[1], im_shape_h: semgt.shape[0] })
-            print("mIoU: {:.4f}".format(miou_value) , " acc {:.4f}".format(acc_value) , " idx " , idx+1, end='\n')
+            #print("mIoU: {:.4f}".format(miou_value) , " acc {:.4f}".format(acc_value) , " idx " , idx+1, end='\n')
             
     print("\n#######################")      
     mean=0
