@@ -137,6 +137,7 @@ class U_Net(object):
             total_value, count_value = self.sess.run([self.total,self.count])
             total_loc += total_value
             count_loc += count_value
+        print(total_loc,count_loc)
         mean_acc = total_loc / count_loc
         return mean_acc
 
