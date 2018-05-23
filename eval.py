@@ -171,8 +171,10 @@ with tf.Session() as sess:
             semgt = cv2.imread(fpath,cv2.IMREAD_GRAYSCALE)
             splits=os.path.splitext(os.path.basename(fpath))[0].split("_")
             basename=splits[0]+"_"+splits[1]+"_"+splits[2]
+            
             sem = cv2.imread(predictions[basename],cv2.IMREAD_GRAYSCALE)
-            acc_value, _, miou_value, _ =sess.run([acc, update_op_acc, miou, update_op],feed_dict={sem_seg_placeholder : np.expand_dims(sem,axis=-1) , sem_gt_placeholder : semgt})
+            _,_=sess.run([update_op_acc,update_op],feed_dict={sem_seg_placeholder : np.expand_dims(sem,axis=-1) , sem_gt_placeholder : semgt})
+            acc_value, miou_value =sess.run([acc, miou],feed_dict={sem_seg_placeholder : np.expand_dims(sem,axis=-1) , sem_gt_placeholder : semgt})
             #, im_shape_w: semgt.shape[1], im_shape_h: semgt.shape[0] })
             #print("mIoU: {:.4f}".format(miou_value) , " acc {:.4f}".format(acc_value) , " idx " , idx+1, end='\n')
             

@@ -117,13 +117,13 @@ class U_Net(object):
             #     image = tf.image.random_flip_left_right(image)
         elif is_test:
             tmp = (256  - im_shape[0] % 256) % 256
-            pad_up = tmp//2
-            pad_down =  tmp -  tmp//2
+            self.pad_up = tmp//2
+            self.pad_down =  tmp -  tmp//2
             tmp = (256  - im_shape[1] % 256) % 256
-            pad_left = tmp//2
-            pad_right =  tmp -  tmp//2
-            image = tf.pad(image,[[pad_up,pad_down],[pad_left,pad_right],[0,0]],"REFLECT")
-            image_sem = tf.pad(image_sem,[[pad_up,pad_down],[pad_left,pad_right],[0,0]],"REFLECT")
+            self.pad_left = tmp//2
+            self.pad_right =  tmp -  tmp//2
+            image = tf.pad(image,[[self.pad_up,self.pad_down],[self.pad_left,self.pad_right],[0,0]],"REFLECT")
+            image_sem = tf.pad(image_sem,[[self.pad_up,self.pad_down],[self.pad_left,self.pad_right],[0,0]],"REFLECT")
             image.set_shape([None,None,3])
             image_sem.set_shape([None,None,1])
         #     image = tf.image.resize_images(image,[self.load_size_h,self.load_size_w])
@@ -309,7 +309,8 @@ class U_Net(object):
         count=0
         while count <= args.num_sample_test:
             print('Processed images: {}'.format(count), end='\r')
-            pred_sem_imgs,sample_images,sample_paths,im_sps, sem_gt = self.sess.run([sem_images_out,sample_op,sample_path,im_shape,sample_op_sem])
+            pred_sem_imgs,sample_images,sample_paths,im_sps, sem_gt,p_left,p_right,p_up, p_down = self.sess.run([
+                sem_images_out,sample_op,sample_path,im_shape,sample_op_sem,self.pad_left,self.pad_right, self.pad_up, self.pad_down])
             #iterate over each sample in the batch
             #create output destination
             print(sample_paths[0])
@@ -320,6 +321,7 @@ class U_Net(object):
 
             im_sp = im_sps[0]
             pred_sem_img = np.squeeze(pred_sem_imgs[0],axis=-1)
+            pred_sem_img = pred_sem_img[p_up:-p_down,p_left:-p_right]
             misc.imsave(dest_path,pred_sem_img)
             
             count+=1
