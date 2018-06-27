@@ -321,7 +321,9 @@ class U_Net(object):
 
             im_sp = im_sps[0]
             pred_sem_img = np.squeeze(pred_sem_imgs[0],axis=-1)
-            pred_sem_img = pred_sem_img[p_up:-p_down,p_left:-p_right]
+            
+            pred_sem_img = pred_sem_img[p_up if p_up !=0  else None:-p_down if p_down != 0 else None,p_left if p_left != 0 else None:-p_right if p_right !=0 else None]
+            print(pred_sem_img.shape)
             misc.imsave(dest_path,pred_sem_img)
             
             count+=1
